@@ -6,6 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminAuthController } from '@src/admin/auth/controllers';
 import { AdminAuthService } from '@src/admin/auth/services';
 import { RepositoryService } from '@src/admin/auth/providers';
+import { AdminManagementService } from '@src/admin/management/services';
+import { AdminManagementController } from '@src/admin/management/controllers';
+import { UserModule } from '@src/user/user.module';
 
 @Module({
   imports: [
@@ -18,9 +21,10 @@ import { RepositoryService } from '@src/admin/auth/providers';
       }),
       inject: [ConfigService],
     }),
+    UserModule,
   ],
-  controllers: [AdminAuthController],
-  providers: [AdminAuthService, RepositoryService],
+  controllers: [AdminAuthController, AdminManagementController],
+  providers: [AdminAuthService, RepositoryService, AdminManagementService],
   exports: [AdminAuthService],
 })
 export class AdminModule {}
