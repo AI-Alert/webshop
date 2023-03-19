@@ -13,8 +13,12 @@ import {
   UserEntity,
 } from '@src/entities';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CreateBrandDto, CreateCategoryDto } from '@src/admin/management/dto';
+import { Equal, Repository } from 'typeorm';
+import {
+  CreateBrandDto,
+  CreateCategoryDto,
+  CreateProductDto,
+} from '@src/admin/management/dto';
 
 @Injectable()
 export class AdminManagementService {
@@ -45,20 +49,6 @@ export class AdminManagementService {
     return {
       users: users,
       amount: allUsers.length,
-    };
-  }
-  async listProducts(
-    skip = 0,
-    limit = 0,
-  ): Promise<{ products: ProductEntity[]; amount: number }> {
-    const allProducts = await this._productRepository.find();
-    const products = await this._productRepository.find({
-      skip,
-      take: limit,
-    });
-    return {
-      products: products,
-      amount: allProducts.length,
     };
   }
 
@@ -169,5 +159,124 @@ export class AdminManagementService {
     }
     await this._brandRepository.delete({ id: id });
     return `Brand ${id} deleted successfully`;
+  }
+
+  async listProducts(
+    skip = 0,
+    limit = 0,
+    categoryName: string,
+  ): Promise<{ products: ProductEntity[]; amount: number }> {
+    const category = await this._categoryRepository.findOneBy({
+      name: categoryName,
+    });
+    if (!category) {
+      throw new NotFoundException(`Category ${categoryName} doesn't found`);
+    }
+    const allProducts = await this._productRepository.find({
+      where: { category: Equal(category.id) },
+    });
+    const products = await this._productRepository.find({
+      skip,
+      take: limit,
+      where: { category: Equal(category.id) },
+    });
+    return {
+      products: products,
+      amount: allProducts.length,
+    };
+  }
+  async addProduct(
+    dto: CreateProductDto,
+    categoryName: string,
+  ): Promise<ProductEntity> {
+    const isProduct = await this._productRepository.find({
+      where: { name: dto.name },
+    });
+    if (isProduct.length > 0) {
+      throw new BadRequestException('Product with this name is already exists');
+    }
+    const category = await this._categoryRepository.findOneBy({
+      name: categoryName,
+    });
+    if (!category) {
+      throw new NotFoundException(`Category ${categoryName} doesn't found`);
+    }
+    let brandRes = {};
+    const brand = await this._brandRepository.findOneBy({
+      name: dto.brandName,
+    });
+    if (!brand) {
+      throw new NotFoundException(`Brand ${dto.brandName} doesn't found`);
+    }
+    brandRes = brand;
+
+    if (!dto.newPrice) {
+      dto.newPrice = 0;
+    }
+    if (!dto.discount) {
+      dto.discount = 0;
+    }
+    if (!dto.rate) {
+      dto.rate = 0;
+    }
+    const res = { ...dto, category: category, brand: brandRes };
+    return await this._productRepository.save(res);
+  }
+  async getProduct(id: number, categoryName: string): Promise<ProductEntity> {
+    const category = await this._categoryRepository.findOneBy({
+      name: categoryName,
+    });
+    if (!category) {
+      throw new NotFoundException(`Category ${categoryName} doesn't found`);
+    }
+    const product = await this._productRepository.findOneBy({
+      id: id,
+      category: Equal(category.id),
+    });
+    if (!product) {
+      throw new NotFoundException(`Product ${id} doesn't exists`);
+    }
+    return product;
+  }
+
+  async updateProduct(
+    id: number,
+    dto: Partial<CreateProductDto>,
+    categoryName: string,
+  ): Promise<ProductEntity> {
+    const category = await this._categoryRepository.findOneBy({
+      name: categoryName,
+    });
+    if (!category) {
+      throw new NotFoundException(`Category ${categoryName} doesn't found`);
+    }
+    const product = await this._productRepository.findOneBy({
+      id: id,
+      category: Equal(category.id),
+    });
+    if (!product) {
+      throw new NotFoundException(`Product ${id} doesn't exists`);
+    }
+    await this._productRepository.update({ id: id }, dto);
+    return await this._productRepository.findOneBy({
+      id: id,
+    });
+  }
+  async deleteProduct(id: number, categoryName): Promise<string> {
+    const category = await this._categoryRepository.findOneBy({
+      name: categoryName,
+    });
+    if (!category) {
+      throw new NotFoundException(`Category ${categoryName} doesn't found`);
+    }
+    const product = await this._productRepository.findOneBy({
+      id: id,
+      category: Equal(category.id),
+    });
+    if (!product) {
+      throw new NotFoundException(`Product ${id} doesn't exists`);
+    }
+    await this._productRepository.delete({ id: id });
+    return `Product ${id} deleted successfully`;
   }
 }

@@ -31,7 +31,11 @@ import {
   EXAMPLE_PRODUCT,
   EXAMPLE_USER,
 } from '@shared/swagger';
-import { CreateBrandDto, CreateCategoryDto } from '@src/admin/management/dto';
+import {
+  CreateBrandDto,
+  CreateCategoryDto,
+  CreateProductDto,
+} from '@src/admin/management/dto';
 
 @ApiTags('Admin Management')
 @ApiBearerAuth()
@@ -59,24 +63,6 @@ export class AdminManagementController {
   ): Promise<{ users: UserEntity[]; amount: number }> {
     return this._adminManagementService.listUsers(query.skip, query.limit);
   }
-  @ApiQuery({ name: 'skip', type: Number, required: false })
-  @ApiQuery({ name: 'limit', type: Number, required: false })
-  @Get('products')
-  @ApiOperation({ summary: 'Find products with pagination params' })
-  @ApiOkResponse({
-    description: 'Returns the list of products',
-    content: {
-      'application/json': {
-        example: [EXAMPLE_PRODUCT],
-      },
-    },
-  })
-  async listProducts(
-    @Query() query: PaginationQuery,
-  ): Promise<{ products: ProductEntity[]; amount: number }> {
-    return this._adminManagementService.listProducts(query.skip, query.limit);
-  }
-
   @ApiQuery({ name: 'skip', type: Number, required: false })
   @ApiQuery({ name: 'limit', type: Number, required: false })
   @Get('categories')
@@ -228,5 +214,100 @@ export class AdminManagementController {
   })
   async deleteBrand(@Param() params: IdParams): Promise<string> {
     return this._adminManagementService.deleteBrand(+params.id);
+  }
+
+  @ApiQuery({ name: 'skip', type: Number, required: false })
+  @ApiQuery({ name: 'limit', type: Number, required: false })
+  @Get('categories/:categoryName/products')
+  @ApiOperation({ summary: 'Find products with pagination params' })
+  @ApiOkResponse({
+    description: 'Returns the list of products',
+    content: {
+      'application/json': {
+        example: [EXAMPLE_PRODUCT],
+      },
+    },
+  })
+  async listProducts(
+    @Query() query: PaginationQuery,
+    @Param('categoryName') categoryName: string,
+  ): Promise<{ products: ProductEntity[]; amount: number }> {
+    return this._adminManagementService.listProducts(
+      query.skip,
+      query.limit,
+      categoryName,
+    );
+  }
+
+  @Get('categories/:categoryName/products/:id')
+  @ApiOperation({ summary: 'Find product by Id' })
+  @ApiOkResponse({
+    description: 'Returns the product',
+    content: {
+      'application/json': {
+        example: EXAMPLE_PRODUCT,
+      },
+    },
+  })
+  async getProduct(
+    @Param('id') id: string,
+    @Param('categoryName') categoryName: string,
+  ): Promise<ProductEntity> {
+    return this._adminManagementService.getProduct(+id, categoryName);
+  }
+
+  @Post('categories/:categoryName/products')
+  @ApiOperation({ summary: 'Add product' })
+  @ApiOkResponse({
+    description: 'Returns a new product',
+    content: {
+      'application/json': {
+        example: EXAMPLE_PRODUCT,
+      },
+    },
+  })
+  async addProduct(
+    @Body() payload: CreateProductDto,
+    @Param('categoryName') categoryName: string,
+  ): Promise<ProductEntity> {
+    return this._adminManagementService.addProduct(payload, categoryName);
+  }
+
+  @Patch('categories/:categoryName/products/:id')
+  @ApiOperation({ summary: 'Update product' })
+  @ApiOkResponse({
+    description: 'Returns an updated product',
+    content: {
+      'application/json': {
+        example: EXAMPLE_PRODUCT,
+      },
+    },
+  })
+  async updateProduct(
+    @Param('id') id: string,
+    @Param('categoryName') categoryName: string,
+    @Body() payload: Partial<CreateProductDto>,
+  ): Promise<ProductEntity> {
+    return this._adminManagementService.updateProduct(
+      +id,
+      payload,
+      categoryName,
+    );
+  }
+  @Delete('categories/:categoryName/products/:id')
+  @ApiOperation({ summary: 'Delete product' })
+  @ApiOkResponse({
+    description: 'Returns message about deleting',
+    content: {
+      'application/json': {
+        example: 'Product 123 deleted successfully',
+      },
+    },
+  })
+  async deleteProduct(
+    @Param('id') id: string,
+    @Param('categoryName') categoryName: string,
+  ): Promise<string> {
+    return this._adminManagementService.deleteProduct(+id, categoryName);
   }
 }
