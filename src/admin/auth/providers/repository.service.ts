@@ -2,11 +2,10 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { AdminEntity } from '@src/entities/admin.entity';
-
 import { generateHash } from '@utils/auth.utils';
 
 import { CreateAdminDto } from '@src/admin/auth/dto';
+import { AdminEntity } from '@src/entities';
 
 @Injectable()
 export class RepositoryService {

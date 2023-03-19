@@ -9,16 +9,18 @@ import {
 import { JwtAuthAdminGuardRedis } from '@src/auth/guards';
 import { AdminManagementService } from '@src/admin/management/services';
 import { PaginationQuery } from '@shared/dto';
-import { UserEntity } from '@src/entities';
-import { ProductEntity } from '@src/entities/product.entity';
-import { BrandEntity } from '@src/entities/brand.entity';
+import {
+  UserEntity,
+  ProductEntity,
+  BrandEntity,
+  CategoryEntity,
+} from '@src/entities';
 import {
   EXAMPLE_BRAND,
   EXAMPLE_CATEGORY,
   EXAMPLE_PRODUCT,
   EXAMPLE_USER,
 } from '@shared/swagger';
-import { CategoryEntity } from '@src/entities/category.entity';
 
 @ApiTags('Admin Management')
 @ApiBearerAuth()

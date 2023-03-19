@@ -4,8 +4,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { AdminEntity } from '@src/entities';
-import { JwtStrategy, LocalAdminStrategy } from '@src/auth/strategies';
-import { LocalUserStrategy } from '@src/auth/strategies/local.user.strategy';
+import {
+  JwtStrategy,
+  LocalAdminStrategy,
+  LocalUserStrategy,
+} from '@src/auth/strategies';
 import { AdminModule } from '@src/admin/admin.module';
 import { UserModule } from '@src/user/user.module';
 

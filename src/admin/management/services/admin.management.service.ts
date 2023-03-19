@@ -3,12 +3,14 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
-import { UserEntity } from '@src/entities';
-import { ProductEntity } from '@src/entities/product.entity';
+import {
+  UserEntity,
+  ProductEntity,
+  BrandEntity,
+  CategoryEntity,
+} from '@src/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BrandEntity } from '@src/entities/brand.entity';
-import { CategoryEntity } from '@src/entities/category.entity';
 
 @Injectable()
 export class AdminManagementService {

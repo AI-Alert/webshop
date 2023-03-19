@@ -1,7 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractEntity } from '@shared/entities';
-import { BrandEntity } from '@src/entities/brand.entity';
-import { CategoryEntity } from '@src/entities/category.entity';
+import { BrandEntity, CategoryEntity } from '@src/entities';
 
 @Entity({ name: 'product' })
 export class ProductEntity extends AbstractEntity {

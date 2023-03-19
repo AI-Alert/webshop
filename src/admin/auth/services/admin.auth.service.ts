@@ -6,7 +6,7 @@ import { RedisService } from '@liaoliaots/nestjs-redis';
 import omit from 'lodash/omit';
 
 import { TokenPair } from '@constants/auth.constant';
-import { AdminEntity } from '@src/entities/admin.entity';
+import { AdminEntity } from '@src/entities';
 import { compareHash } from '@utils/auth.utils';
 
 import { CreateAdminDto } from '@src/admin/auth/dto';
