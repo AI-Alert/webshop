@@ -1,5 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AdminEntity } from '@src/entities';
+import {
+  AdminEntity,
+  BrandEntity,
+  CategoryEntity,
+  ProductEntity,
+} from '@src/entities';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,7 +17,12 @@ import { UserModule } from '@src/user/user.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AdminEntity]),
+    TypeOrmModule.forFeature([
+      AdminEntity,
+      ProductEntity,
+      BrandEntity,
+      CategoryEntity,
+    ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => ({

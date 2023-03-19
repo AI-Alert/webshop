@@ -24,23 +24,7 @@ import { UserProfileService } from '@src/user/profile/services';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
-export const EXAMPLE_USER = {
-  id: '123',
-  photoUrl:
-    'https://t3.ftcdn.net/jpg/00/64/67/52/360_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg',
-  name: 'Tom Sample Org.',
-  description: 'Tom sample description',
-  contactName: 'Tom',
-  email: 'tom@sample.com',
-  phoneNumber: '1234567890',
-  address: 'Fake str. 17',
-  websiteUrl: 'https://tom-sample.com',
-  category: {},
-  sustainableGoals: [],
-  status: 'active',
-  verification: {},
-  opportunities: [],
-};
+import { EXAMPLE_USER } from '@shared/swagger';
 
 @ApiTags('User Profile')
 @ApiBearerAuth()
