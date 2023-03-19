@@ -2,7 +2,6 @@ import { IsString, IsEmail, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { AdminStatuses } from '@shared/enums';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 export class CreateAdminDto {
   @ApiProperty({ enum: AdminStatuses })
   public status: AdminStatuses;
