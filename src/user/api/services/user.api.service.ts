@@ -9,8 +9,4 @@ export class UserApiService {
     @InjectRepository(UserEntity)
     private readonly _userRepository: Repository<UserEntity>,
   ) {}
-
-  findAll(skip?: number, limit?: number): Promise<UserEntity[]> {
-    return this._userRepository.find({ skip, take: limit });
-  }
 }

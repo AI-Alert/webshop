@@ -4,6 +4,7 @@ import {
   BrandEntity,
   CategoryEntity,
   ProductEntity,
+  UserEntity,
 } from '@src/entities';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -13,7 +14,6 @@ import { AdminAuthService } from '@src/admin/auth/services';
 import { RepositoryService } from '@src/admin/auth/providers';
 import { AdminManagementService } from '@src/admin/management/services';
 import { AdminManagementController } from '@src/admin/management/controllers';
-import { UserModule } from '@src/user/user.module';
 
 @Module({
   imports: [
@@ -22,6 +22,7 @@ import { UserModule } from '@src/user/user.module';
       ProductEntity,
       BrandEntity,
       CategoryEntity,
+      UserEntity,
     ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -31,7 +32,6 @@ import { UserModule } from '@src/user/user.module';
       }),
       inject: [ConfigService],
     }),
-    UserModule,
   ],
   controllers: [AdminAuthController, AdminManagementController],
   providers: [AdminAuthService, RepositoryService, AdminManagementService],
