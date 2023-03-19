@@ -12,12 +12,18 @@ import {
   HttpCode,
   HttpStatus,
   Patch,
+  Post,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserEntity } from '@src/entities';
 import { JwtAuthUserGuardRedis } from '@src/auth/guards';
 import { UserProfileService } from '@src/user/profile/services';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { FileInterceptor } from '@nestjs/platform-express';
 export const EXAMPLE_USER = {
   id: '123',
   photoUrl:
@@ -85,5 +91,36 @@ export class UserProfileController {
   async editProfileInfo(@Req() req, @Body() dto): Promise<Partial<UserEntity>> {
     const userId = req.user.id;
     return this._userProfileService.editProfileDetails(userId, dto);
+  }
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+          return cb(
+            new Error('Only .jpg, .jpeg and .png files are allowed!'),
+            false,
+          );
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    return {
+      filename: file.filename,
+      originalName: file.originalname,
+      url: `../uploads/profile-photos/${file.filename}`,
+    };
   }
 }

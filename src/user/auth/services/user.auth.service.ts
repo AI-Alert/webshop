@@ -1,38 +1,23 @@
 import { JwtService } from '@nestjs/jwt';
-import {
-  CreatePasswordDto,
-  ResetPasswordDto,
-  VerifyResetPasswordDto,
-} from '@src/user/auth/dto';
-import { InjectRepository } from '@nestjs/typeorm';
+import { CreatePasswordDto, RegisterDto } from '@src/user/auth/dto';
 import { TokenPair } from '@constants/auth.constant';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserTypes } from '@shared/enums';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import { ConfigService } from '@nestjs/config';
-import { Repository } from 'typeorm';
 import { RepositoryService } from '@src/user/auth/providers';
-import { UserEntity, UserVerificationEntity } from '@src/entities';
+import { UserEntity } from '@src/entities';
 import {
   CreatePasswordAlreadySetException,
-  ResetPasswordNotRequestedException,
-  TooManyRequestsException,
   UserNotFoundException,
-  WrongCodeException,
 } from '@shared/exceptions/auth';
-import {
-  compareHash,
-  generateHash,
-  generateVerificationCode,
-} from '@utils/auth.utils';
+import { compareHash, generateHash } from '@utils/auth.utils';
 import omit from 'lodash/omit';
 
 @Injectable()
 export class UserAuthService {
   constructor(
-    @InjectRepository(UserVerificationEntity)
-    private readonly _verificationRepository: Repository<UserVerificationEntity>,
     private readonly _redisService: RedisService,
     private readonly _repositoryService: RepositoryService,
     private readonly _jwtService: JwtService,
@@ -185,100 +170,6 @@ export class UserAuthService {
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   }
 
-  /**
-   * Handles password reset
-   *
-   * @param resetPasswordDto
-   * @returns success or fail
-   */
-  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<boolean> {
-    const user = await this._repositoryService.findByEmail(
-      resetPasswordDto.email,
-    );
-
-    if (!user) {
-      throw new UserNotFoundException();
-    }
-
-    const ONE_MINUTE = 60000;
-    const timeSinceLastCodeSent =
-      Date.now() -
-        user.verification.lastPasswordVerificationCodeSentAt?.getTime() ?? 0;
-    if (timeSinceLastCodeSent < ONE_MINUTE) {
-      throw new TooManyRequestsException({
-        method: 'reset-password',
-        timeLeft: ONE_MINUTE - timeSinceLastCodeSent,
-      });
-    }
-
-    const passwordVerificationCode = generateVerificationCode();
-    await this._verificationRepository.update(
-      { id: user.verification.id },
-      {
-        passwordVerificationCode,
-        lastPasswordVerificationCodeSentAt: new Date(),
-      },
-    );
-
-    return true;
-  }
-
-  private getInviteToken(payload: { id: number; email: string }) {
-    const inviteExpiration = this._config.get('jwt.inviteExpiresIn');
-
-    return this._jwtService.sign(payload, {
-      expiresIn: inviteExpiration,
-    });
-  }
-
-  async verifyResetPassword(
-    verifyResetPasswordDto: VerifyResetPasswordDto,
-  ): Promise<string> {
-    const user = await this._repositoryService.findByEmail(
-      verifyResetPasswordDto.email,
-    );
-
-    if (!user) {
-      throw new UserNotFoundException();
-    }
-    if (!user.verification.passwordVerificationCode) {
-      throw new ResetPasswordNotRequestedException();
-    }
-
-    const isDevelopment = ['development', 'local'].includes(
-      this._config.get('NODE_ENV'),
-    );
-    const developmentCodeEntered =
-      isDevelopment && verifyResetPasswordDto.verificationCode === '000000';
-
-    const codeValid =
-      developmentCodeEntered ||
-      verifyResetPasswordDto.verificationCode ===
-        user.verification.passwordVerificationCode;
-    if (!codeValid) {
-      throw new WrongCodeException({ method: 'verify-reset-password' });
-    }
-
-    await this._repositoryService.update(user.id, {
-      passwordHash: null,
-      lastPasswordResetDate: new Date(),
-    });
-
-    await this._verificationRepository.update(
-      { id: user.verification.id },
-      {
-        passwordVerificationCode: null,
-        lastPasswordVerificationCodeSentAt: null,
-      },
-    );
-
-    const payload = { id: user.id, email: user.email };
-
-    const token = this.getInviteToken(payload);
-    this._jwtRedisClient.set(token, user.email);
-    return token;
-  }
-
   async checkTokenExpiration(accessToken: string): Promise<boolean> {
     const payload: any = this._jwtService.decode(accessToken);
     const user = await this._repositoryService.findByEmail(payload.username);
@@ -287,5 +178,20 @@ export class UserAuthService {
     const tokenIssuedMs = payload.iat * 1000;
 
     return tokenIssuedMs > lastResetMs;
+  }
+
+  async register(dto: RegisterDto) {
+    const { email, name, password } = dto;
+    const hashedPassword = await generateHash(password);
+    const user = new UserEntity();
+    if (!dto.photoUrl) {
+      user.photoUrl =
+        'https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg';
+    }
+    user.name = name;
+    user.contactName = name;
+    user.email = email;
+    user.passwordHash = hashedPassword;
+    return this._repositoryService.save(user);
   }
 }

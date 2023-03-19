@@ -12,13 +12,10 @@ import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 
 import { UserAuthService } from '@src/user/auth/services';
 import { LocalUserAuthGuard, JwtAuthUserGuardRedis } from '@src/auth/guards';
-import {
-  CreatePasswordDto,
-  ResetPasswordDto,
-  VerifyResetPasswordDto,
-} from '@src/user/auth/dto';
+import { CreatePasswordDto, RegisterDto } from '@src/user/auth/dto';
 
 import { TokenPair } from '@constants/auth.constant';
+import { UserEntity } from '@src/entities';
 
 @ApiTags('User Authentication')
 @Controller('user/auth')
@@ -69,28 +66,20 @@ export class UserAuthController {
     const accessToken = req.headers['authorization'].replace('Bearer ', '');
     return this._userAuthService.logout(accessToken);
   }
-
-  @Post('reset-password')
-  @HttpCode(HttpStatus.OK)
-  async resetPassword(
-    @Body() resetPasswordDto: ResetPasswordDto,
-  ): Promise<boolean> {
-    return this._userAuthService.resetPassword(resetPasswordDto);
-  }
-
-  @Post('verify-reset-password')
-  @HttpCode(HttpStatus.OK)
-  async verifyResetPassword(
-    @Body() verifyResetPasswordDto: VerifyResetPasswordDto,
-  ): Promise<string> {
-    return this._userAuthService.verifyResetPassword(verifyResetPasswordDto);
-  }
-
   @Post('create-password')
   @HttpCode(HttpStatus.OK)
   async createPassword(
     @Body() createPasswordDto: CreatePasswordDto,
   ): Promise<TokenPair> {
     return this._userAuthService.createPassword(createPasswordDto);
+  }
+
+  @Post('register')
+  @HttpCode(HttpStatus.OK)
+  async register(@Body() registerDto: RegisterDto): Promise<UserEntity> {
+    if (registerDto.password !== registerDto.confirmPassword) {
+      throw new Error(`Passwords don't match`);
+    }
+    return this._userAuthService.register(registerDto);
   }
 }

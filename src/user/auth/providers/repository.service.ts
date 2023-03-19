@@ -35,4 +35,8 @@ export class RepositoryService {
 
     return entityToReturn;
   }
+
+  async save(user: UserEntity): Promise<UserEntity> {
+    return this._userRepository.save(user);
+  }
 }

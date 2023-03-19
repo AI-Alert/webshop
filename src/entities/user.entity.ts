@@ -1,14 +1,6 @@
-import {
-  Column,
-  DeleteDateColumn,
-  Entity,
-  Index,
-  JoinColumn,
-  OneToOne,
-} from 'typeorm';
+import { Column, DeleteDateColumn, Entity } from 'typeorm';
 import { AbstractEntity } from '@shared/entities/abstract.entity';
 import { Exclude } from 'class-transformer';
-import { UserVerificationEntity } from '@src/entities/user-verification.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends AbstractEntity {
@@ -46,14 +38,4 @@ export class UserEntity extends AbstractEntity {
 
   @DeleteDateColumn()
   deletedAt?: Date;
-
-  @OneToOne(
-    () => UserVerificationEntity,
-    (verification: UserVerificationEntity) => verification.user,
-    { eager: true, nullable: false, onDelete: 'CASCADE' },
-  )
-  @JoinColumn()
-  @Index()
-  @Exclude()
-  public verification: UserVerificationEntity;
 }

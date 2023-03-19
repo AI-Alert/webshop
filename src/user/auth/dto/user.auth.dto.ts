@@ -5,6 +5,7 @@ import {
   IsEmail,
   IsJWT,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
   NotContains,
@@ -49,4 +50,42 @@ export class ResetPasswordDto extends EmailDto {}
 
 export class VerifyResetPasswordDto extends VerifyEmailDto {}
 
-export class SendVerificationCodeDto extends EmailDto {}
+export class RegisterDto extends EmailDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  readonly name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  @IsOptional()
+  readonly photoUrl?: string;
+
+  @IsStrongPassword({
+    minLength: 8,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 0,
+  })
+  @NotContains(' ', {
+    message: '$property cannot have spaces',
+  })
+  @IsNotEmpty()
+  @ApiProperty()
+  readonly password: string;
+  @IsStrongPassword({
+    minLength: 8,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 0,
+  })
+  @NotContains(' ', {
+    message: '$property cannot have spaces',
+  })
+  @IsNotEmpty()
+  @ApiProperty()
+  readonly confirmPassword: string;
+}
