@@ -6,6 +6,7 @@ import {
   ProductEntity,
   ReviewEntity,
   UserEntity,
+  CartEntity,
 } from '@src/entities';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -25,6 +26,7 @@ import { UserApiControllers } from '@src/user/api/controllers';
       CategoryEntity,
       BrandEntity,
       ProductEntity,
+      CartEntity,
     ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],

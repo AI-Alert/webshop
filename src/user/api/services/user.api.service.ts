@@ -13,6 +13,7 @@ import {
   UserEntity,
 } from '@src/entities';
 import { CreateReviewDto } from '@src/user/api/dto';
+import { CartEntity } from '@src/entities/cart.entity';
 
 @Injectable()
 export class UserApiService {
@@ -27,6 +28,8 @@ export class UserApiService {
     private readonly _categoryRepository: Repository<CategoryEntity>,
     @InjectRepository(BrandEntity)
     private readonly _brandRepository: Repository<BrandEntity>,
+    @InjectRepository(CartEntity)
+    private readonly _cartRepository: Repository<CartEntity>,
   ) {}
 
   async listBrands(
@@ -262,5 +265,14 @@ export class UserApiService {
     }
     await this._reviewRepository.delete({ id: id });
     return `Review ${id} deleted successfully`;
+  }
+
+  async createCart(): Promise<CartEntity> {
+    return await this._cartRepository.save({ total: 0 });
+  }
+
+  async _findCartByUserId(id: number): Promise<CartEntity> {
+    const user = await this._userRepository.findOneBy({ id: id });
+    return this._cartRepository.findOneBy({ id: user.cart.id });
   }
 }

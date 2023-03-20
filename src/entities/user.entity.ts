@@ -1,6 +1,14 @@
-import { Column, DeleteDateColumn, Entity } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  Index,
+  JoinColumn,
+  OneToOne,
+} from 'typeorm';
 import { AbstractEntity } from '@shared/entities/abstract.entity';
 import { Exclude } from 'class-transformer';
+import { CartEntity } from '@src/entities/cart.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends AbstractEntity {
@@ -38,4 +46,14 @@ export class UserEntity extends AbstractEntity {
 
   @DeleteDateColumn()
   deletedAt?: Date;
+
+  @OneToOne(() => CartEntity, (cart: CartEntity) => cart.user, {
+    eager: true,
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  @Index()
+  @Exclude()
+  public cart: CartEntity;
 }

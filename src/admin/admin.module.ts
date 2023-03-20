@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import {
   AdminEntity,
   BrandEntity,
+  CartEntity,
   CategoryEntity,
   ProductEntity,
   ReviewEntity,
@@ -25,6 +26,7 @@ import { AdminManagementController } from '@src/admin/management/controllers';
       CategoryEntity,
       UserEntity,
       ReviewEntity,
+      CartEntity,
     ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],

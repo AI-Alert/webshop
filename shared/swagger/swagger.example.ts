@@ -113,3 +113,8 @@ export const EXAMPLE_REVIEWS = {
     ],
   },
 };
+
+export const EXAMPLE_CART = {
+  id: '123',
+  total: 'Advantage text',
+};

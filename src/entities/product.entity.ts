@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { AbstractEntity } from '@shared/entities';
 import { BrandEntity, CategoryEntity, ReviewEntity } from '@src/entities';
+import { CartEntity } from '@src/entities/cart.entity';
 
 @Entity({ name: 'product' })
 export class ProductEntity extends AbstractEntity {
@@ -54,4 +55,13 @@ export class ProductEntity extends AbstractEntity {
 
   @OneToMany(() => ReviewEntity, (review) => review.product)
   public reviews: ReviewEntity[];
+
+  @ManyToOne(() => CartEntity, (cart: CartEntity) => cart.products, {
+    eager: true,
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  @Index()
+  public cart: CartEntity;
 }

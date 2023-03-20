@@ -8,6 +8,7 @@ import { RedisService } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import {
   BrandEntity,
+  CartEntity,
   CategoryEntity,
   ProductEntity,
   UserEntity,
@@ -33,6 +34,8 @@ export class AdminManagementService {
     private readonly _brandRepository: Repository<BrandEntity>,
     @InjectRepository(CategoryEntity)
     private readonly _categoryRepository: Repository<CategoryEntity>,
+    @InjectRepository(CartEntity)
+    private readonly _cartRepository: Repository<CartEntity>,
   ) {
     this._jwtRedisClient = this._redis.getClient(
       this._config.get('redis.jwtClient'),

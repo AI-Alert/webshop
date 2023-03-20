@@ -14,6 +14,7 @@ import {
 } from '@shared/exceptions/auth';
 import { compareHash, generateHash } from '@utils/auth.utils';
 import omit from 'lodash/omit';
+import { UserApiService } from '@src/user/api/services';
 
 @Injectable()
 export class UserAuthService {
@@ -22,6 +23,7 @@ export class UserAuthService {
     private readonly _repositoryService: RepositoryService,
     private readonly _jwtService: JwtService,
     private readonly _config: ConfigService,
+    private readonly _userApiService: UserApiService,
   ) {
     this._jwtRedisClient = this._redisService.getClient(
       this._config.get('redis.jwtClient'),
@@ -192,6 +194,7 @@ export class UserAuthService {
     user.contactName = name;
     user.email = email;
     user.passwordHash = hashedPassword;
+    user.cart = await this._userApiService.createCart();
     return this._repositoryService.save(user);
   }
 }

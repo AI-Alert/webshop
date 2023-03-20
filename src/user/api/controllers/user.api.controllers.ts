@@ -244,4 +244,22 @@ export class UserApiControllers {
   ): Promise<string> {
     return this._userApiService.deleteReview(+id, productName, categoryName);
   }
+
+  @Post('categories/:categoryName/products/:productName/reviews')
+  @ApiOperation({ summary: 'Add reviews' })
+  @ApiOkResponse({
+    description: 'Returns a new reviews',
+    content: {
+      'application/json': {
+        example: EXAMPLE_REVIEWS,
+      },
+    },
+  })
+  async addCart(
+    @Body() payload: CreateReviewDto,
+    @Param('productName') productName: string,
+    @Param('categoryName') categoryName: string,
+  ): Promise<ReviewEntity> {
+    return this._userApiService.addReview(payload, productName, categoryName);
+  }
 }
