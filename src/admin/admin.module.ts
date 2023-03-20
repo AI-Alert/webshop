@@ -4,6 +4,7 @@ import {
   BrandEntity,
   CategoryEntity,
   ProductEntity,
+  ReviewEntity,
   UserEntity,
 } from '@src/entities';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -23,6 +24,7 @@ import { AdminManagementController } from '@src/admin/management/controllers';
       BrandEntity,
       CategoryEntity,
       UserEntity,
+      ReviewEntity,
     ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],

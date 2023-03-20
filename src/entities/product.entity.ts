@@ -1,6 +1,13 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { AbstractEntity } from '@shared/entities';
-import { BrandEntity, CategoryEntity } from '@src/entities';
+import { BrandEntity, CategoryEntity, ReviewEntity } from '@src/entities';
 
 @Entity({ name: 'product' })
 export class ProductEntity extends AbstractEntity {
@@ -44,4 +51,7 @@ export class ProductEntity extends AbstractEntity {
   @JoinColumn()
   @Index()
   public category: CategoryEntity;
+
+  @OneToMany(() => ReviewEntity, (review) => review.product)
+  public reviews: ReviewEntity[];
 }
